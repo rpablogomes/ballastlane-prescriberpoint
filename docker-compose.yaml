@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: prescriberpoint
+      POSTGRES_PASSWORD: prescriberpoint
+      POSTGRES_DB: prescriberpoint
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  
+  scrapper-and-llm:
+    build: ./scrapper-and-llm
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/prescriberpoint
+      POSTGRES_USER: prescriberpoint
+      POSTGRES_PASSWORD: prescriberpoint
+      POSTGRES_DB: prescriberpoint
+      JWT_SECRET_KEY: prescriberpoint
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+    volumes:
+      - ./scrapper-and-llm:/app
+    command: poetry run fastapi run src/main.py
+
+  api:
+    build: ./api
+    restart: always
+    depends_on:
+      - db
+      - scrapper-and-llm
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/prescriberpoint
+      JWT_SECRET: prescriberpoint
+      POSTGRES_USER: prescriberpoint
+      POSTGRES_PASSWORD: prescriberpoint
+      POSTGRES_DB: prescriberpoint
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api:/usr/src/app
+    command: yarn start:dev
+  
+  ui:
+    build: ./ui
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./ui:/usr/src/app
+    depends_on:
+      - api
+      - scrapper-and-llm
+    command: yarn dev
+
+volumes:
+  pgdata:
