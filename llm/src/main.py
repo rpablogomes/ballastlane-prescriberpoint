@@ -11,5 +11,5 @@ class Register(MethodView):
     def get(self, symptons):
         result = main(symptons)["choices"][0]["message"]["content"]
 
-        result = ast.literal_eval(result)
+        array = ast.literal_eval(result)
         return jsonify({"synonyms": result}), 200
