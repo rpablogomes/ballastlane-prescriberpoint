@@ -1,15 +1,15 @@
-from fastapi import FastAPI
+from flask import jsonify
+from flask.views import MethodView
+from flask_smorest import Blueprint
 from daily_med_scrapper.dailymed import dailymedscrap
 
-app = FastAPI()
+scrapper_blp = Blueprint("drug", __name__, url_prefix="/drug", description="Drug Information")
 
-@app.get("/{drugName}")
-def read_root(drugName: str):
-    """"endpoint that return the value of the medicine"""
-
-    ##I set Dupixent based on requiment. However, the intention is to get the medicine name from the user.
-
-    response = dailymedscrap(drugName)
-
-
-    return response
+@scrapper_blp.route("/<drugName>")
+class DrugInfo(MethodView):
+    def get(self, drugName):
+        """Endpoint that returns information about the drug (synonyms)"""
+        
+        response = dailymedscrap(drugName)
+        
+        return jsonify(response), 200

@@ -21,7 +21,6 @@ services:
       - db
     volumes:
       - ./llm:/app
-    command: flask run --host=0.0.0.0 --port=5000
     environment:
     - FLASK_APP=src
     - FLASK_ENV=development
@@ -29,13 +28,13 @@ services:
   scrapper:
     build: ./scrapper
     ports:
-      - "8001:8001"
+      - "8000:8000"
     depends_on:
       - db
       - llm
     volumes:
       - ./scrapper:/app
-    command: fastapi run src/main.py
+    command: flask run --host=0.0.0.0 --port=8000
 
   api:
     build: ./api
