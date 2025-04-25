@@ -14,11 +14,11 @@ import { DrugsService } from './drugs/services/drugs.service';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: 'db',
       port: 5432,
-      username: 'prescriptionpoint',
-      password: 'prescriptionpoint',
-      database: 'prescriptionpoint',
+      username: 'prescriberpoint',
+      password: 'prescriberpoint',
+      database: 'prescriberpoint',
       entities: [Drug, Symptom, Synonym, DrugSymptom],
       synchronize: true,
     }),

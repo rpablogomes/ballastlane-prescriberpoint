@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from scrapper.dailymed import dailymedscrap
+from daily_med_scrapper.dailymed import dailymedscrap
 
 app = FastAPI()
 

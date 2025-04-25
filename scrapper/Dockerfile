@@ -1,5 +1,5 @@
 # Use a lightweight Python image
-FROM python:3.12
+FROM python:3.12-alpine
 
 # Set working directory
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install dependencies
-RUN pip3 install --upgrade pip
+RUN python -m pip install --upgrade pip
 RUN pip3 install -r requirements.txt
 
 # Copy the rest of the application
@@ -20,8 +20,5 @@ ENV PYTHONPATH=/app
 # Set Python output to be unbuffered (better logging)
 ENV PYTHONUNBUFFERED=1
 
-# Expose the Flask application port
-EXPOSE 5000
-
-# Run the Flask app
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+# Expose the fastapi application port
+EXPOSE 8000

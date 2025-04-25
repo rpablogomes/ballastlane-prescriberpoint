@@ -1,5 +1,5 @@
-import requests
 from .. config import EnvClient
+import requests
 
 class GroqAPIConnectError(Exception):
     """
@@ -12,7 +12,7 @@ class GroqAPIConnect:
     """
     A class to manage communication with the Groq API.
 
-    Attributes:
+    Attributes: 
         model (str): The machine learning model to be used for requests.
         env_path (str): The path to the environment file containing API credentials.
         env_client (EnvClient): An instance of EnvClient to retrieve API details.

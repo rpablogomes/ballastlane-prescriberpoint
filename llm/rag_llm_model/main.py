@@ -1,7 +1,6 @@
 from .groq_custom import GroqAPIConnect
 from .embedding.generate_embbeding import Embedding
 from .config.pinecone_ import PineconeClient
-from .embedding.text_segmentation import split_text
 
 def main(symptons):
 
@@ -21,9 +20,6 @@ def main(symptons):
             chat=consult,
             db_content=aux
         )
-
-    print("content")    
-    print(content)
 
     return content
     
