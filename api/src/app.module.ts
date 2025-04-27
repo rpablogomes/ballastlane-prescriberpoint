@@ -1,17 +1,18 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DrugsModule } from './drugs/drugs.module';
 import {
   Drug,
   Symptom,
-  Synonym,
   DrugSymptom,
+  SymptomSynonym,
 } from './drugs/entities/drugs.entity';
-import { DrugsController } from './drugs/controllers/drugs.controller';
-import { DrugsService } from './drugs/services/drugs.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'db',
@@ -19,9 +20,11 @@ import { DrugsService } from './drugs/services/drugs.service';
       username: 'prescriberpoint',
       password: 'prescriberpoint',
       database: 'prescriberpoint',
-      entities: [Drug, Symptom, Synonym, DrugSymptom],
+      entities: [Drug, Symptom, DrugSymptom, SymptomSynonym],
       synchronize: true,
     }),
+
+    HttpModule,
     DrugsModule,
   ],
 })

@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import ast 
 
 def dailymedscrap(drugName):
     drugData = requests.get(f'https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?drug_name={drugName}')
@@ -30,4 +31,4 @@ def dailymedscrap(drugName):
 
     threadedDiseases = [diseases.split('\t')[1] for diseases in indications]
 
-    return {"status": 200, "data": str(threadedDiseases)}
+    return {"status": 200, "data": threadedDiseases}

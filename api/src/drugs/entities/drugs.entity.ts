@@ -1,64 +1,75 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  ManyToOne,
-} from 'typeorm';
+    import {
+      Entity,
+      PrimaryGeneratedColumn,
+      Column,
+      OneToMany,
+      ManyToOne,
+      CreateDateColumn,
+      UpdateDateColumn,
+    } from 'typeorm';
 
-@Entity()
-export class Drug {
-  @PrimaryGeneratedColumn()
-  id_drug: number;
+    @Entity()
+    export class Drug {
+      @PrimaryGeneratedColumn()
+      id: number;
 
-  @Column()
-  drug_name: string;
+      @Column()
+      drugName: string;
 
-  @OneToMany(() => DrugSymptom, (ds) => ds.drug)
-  indications: DrugSymptom[];
-}
+      @CreateDateColumn()
+      createdAt: Date;
 
-@Entity()
-export class Symptom {
-  @PrimaryGeneratedColumn()
-  id_symptom: number;
+      @UpdateDateColumn()
+      updatedAt: Date;
 
-  @Column()
-  symptoms: string;
+      @OneToMany(() => DrugSymptom, (ds) => ds.drug)
+      drugSymptoms: DrugSymptom[];
 
-  @Column()
-  code: string;
+      @OneToMany(() => SymptomSynonym, (synonym) => synonym.drug, { cascade: true })
+      synonyms: SymptomSynonym[];
+    }
 
-  @OneToMany(() => DrugSymptom, (ds) => ds.symptom)
-  drugIndications: DrugSymptom[];
+    @Entity()
+    export class Symptom {
+      @PrimaryGeneratedColumn()
+      id: number;
 
-  @OneToMany(() => Synonym, (s) => s.symptom)
-  synonyms: Synonym[];
-}
+      @Column({ nullable: true })
+      symptomName: string;
 
-@Entity()
-export class Synonym {
-  @PrimaryGeneratedColumn()
-  id_synonym: number;
+      @Column({ nullable: true })
+      code: string;
 
-  @Column()
-  name: string;
+      @OneToMany(() => DrugSymptom, (ds) => ds.symptom)
+      drugSymptoms: DrugSymptom[];
+    }
 
-  @Column({ default: false })
-  confirmation: boolean;
+    @Entity()
+    export class DrugSymptom {
+      @PrimaryGeneratedColumn()
+      id: number;
 
-  @ManyToOne(() => Symptom, (symptom) => symptom.synonyms)
-  symptom: Symptom;
-}
+      @ManyToOne(() => Drug, (drug) => drug.drugSymptoms, {
+        onDelete: 'CASCADE',
+      })
+      drug: Drug;
 
-@Entity()
-export class DrugSymptom {
-  @PrimaryGeneratedColumn()
-  id: number;
+      @ManyToOne(() => Symptom, (symptom) => symptom.drugSymptoms, {
+        onDelete: 'CASCADE',
+      })
+      symptom: Symptom;
+    }
 
-  @ManyToOne(() => Drug, (drug) => drug.indications)
-  drug: Drug;
+    @Entity()
+    export class SymptomSynonym {
+      @PrimaryGeneratedColumn()
+      id: number;
 
-  @ManyToOne(() => Symptom, (symptom) => symptom.drugIndications)
-  symptom: Symptom;
-}
+      @Column({ nullable: true })
+      synonymSymptom: string; 
+
+      @ManyToOne(() => Drug, (drug) => drug.synonyms, {
+        onDelete: 'CASCADE',
+      })
+      drug: Drug;
+    }
