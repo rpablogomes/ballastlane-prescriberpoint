@@ -3,7 +3,8 @@ from flask.views import MethodView
 from flask_smorest import Blueprint
 from daily_med_scrapper.dailymed import dailymedscrap
 
-scrapper_blp = Blueprint("drug", __name__, url_prefix="/drug", description="Drug Information")
+
+scrapper_blp = Blueprint("drug", __name__, url_prefix="/api/scrapper/drug", description="Drug Information")
 
 @scrapper_blp.route("/<drugName>")
 class DrugInfo(MethodView):

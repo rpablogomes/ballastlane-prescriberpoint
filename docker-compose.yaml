@@ -1,70 +1,90 @@
-version: '3.9'
+  version: '3.9'
 
-services:
+  services:
 
-  db:
-    image: postgres:17-alpine
-    environment:
-      POSTGRES_USER: prescriberpoint
-      POSTGRES_PASSWORD: prescriberpoint
-      POSTGRES_DB: prescriberpoint
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+    db:
+      image: postgres:17-alpine
+      environment:
+        POSTGRES_USER: prescriberpoint
+        POSTGRES_PASSWORD: prescriberpoint
+        POSTGRES_DB: prescriberpoint
+      ports:
+        - "5432:5432"
+      volumes:
+        - pgdata:/var/lib/postgresql/data
+      networks:
+        - prescriberpoint-network
 
-  llm:
-    build: ./llm
-    ports:
-      - "5000:5000"
-    depends_on:
-      - db
-    volumes:
-      - ./llm:/app
-    environment:
-    - FLASK_APP=src
-    - FLASK_ENV=development
-  
-  scrapper:
-    build: ./scrapper
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-      - llm
-    volumes:
-      - ./scrapper:/app
-    command: flask run --host=0.0.0.0 --port=8000
+    llm:
+      build: ./llm
+      ports:
+        - "5000:5000"
+      depends_on:
+        - db
+      volumes:
+        - ./llm:/app
 
-  api:
-    build: ./api
-    restart: always
-    depends_on:
-      - db
-      - scrapper
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/prescriberpoint
-      JWT_SECRET: prescriberpoint
-      POSTGRES_USER: prescriberpoint
-      POSTGRES_PASSWORD: prescriberpoint
-      POSTGRES_DB: prescriberpoint
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./api:/usr/src/app
-    command: yarn start:dev
-  
-  ui:
-    build: ./ui
-    restart: always
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./ui:/usr/src/app
-    depends_on:
-      - api
-      - scrapper
-    command: yarn dev
+      command: flask run --host=0.0.0.0 --port=5000 --reload
+      networks:
+        - prescriberpoint-network
+    
+    scrapper:
+      build: ./scrapper
+      ports:
+        - "8000:8000"
+      depends_on:
+        - db
+        - llm
+      volumes:
+        - ./scrapper:/app
+        
+      command: flask run --host=0.0.0.0 --port=8000
+      networks:
+        - prescriberpoint-network
 
-volumes:
-  pgdata:
+          
+    api:
+      build: 
+        context: ./api
+        dockerfile: Dockerfile
+      volumes:
+        - ./api/src:/app/src 
+        - ./api/package.json:/app/package.json
+        - ./api/yarn.lock:/app/yarn.lock
+        - /app/node_modules
+      depends_on:
+        - db
+        - scrapper
+      environment:
+        DATABASE_URL: postgresql://prescriberpoint:prescriberpoint@db:5432/prescriberpoint
+        JWT_SECRET: prescriberpoint
+        POSTGRES_USER: prescriberpoint
+        POSTGRES_PASSWORD: prescriberpoint
+        POSTGRES_DB: prescriberpoint
+        DB_HOST: db
+      ports:
+        - "3000:3000"
+      command: ["sh", "-c", "yarn build && yarn start:dev"]
+      networks:
+        - prescriberpoint-network
+    #TODO
+    # ui:
+    #   build: ./ui
+    #   restart: always
+    #   ports:
+    #     - "5173:5173"
+    #   volumes:
+    #     - ./ui:/usr/src/app
+    #   depends_on:
+    #     - api
+    #     - scrapper
+    #   command: yarn dev
+    # networks:
+    #     - prescriberpoint-network
+
+  volumes:
+    pgdata:
+
+  networks:
+    prescriberpoint-network:
+      driver: bridge

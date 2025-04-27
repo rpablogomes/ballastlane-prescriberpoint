@@ -10,8 +10,9 @@ def main(symptons):
 
     consult = f'return only a list of synonims the symptom {symptons} without any other information'
 
-    embbdConsult = embedding.get_embedding(consult)
 
+    embbdConsult = embedding.get_embedding(consult)
+    
     aux = pc.search_embedding(embbdConsult,top_k=10)
 
     groq = GroqAPIConnect()
@@ -20,8 +21,8 @@ def main(symptons):
             chat=consult,
             db_content=aux
         )
-
-    return content
+    
+    return content["choices"][0]["message"]["content"]
     
 if __name__ == '__main__':
     main()
